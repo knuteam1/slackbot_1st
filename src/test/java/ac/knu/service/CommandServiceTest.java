@@ -1,68 +1,50 @@
 package ac.knu.service;
 
-import ac.knu.exceptions.FriendDataBaseAlreadyFullException;
-import ac.knu.exceptions.FriendDataBaseEmptyException;
+import ac.knu.exceptions.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
-
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CommandServiceTest {
-    private FriendDataBase friendDataBase;
     private CommandService commandService;
+    private FriendDataBase friendDataBase;
     @Before
-    public void setup() {
+    public void setUp() {
         friendDataBase = new FriendDataBase();
-        friendDataBase.addFriendToDataBase("hangeul",11,Friend.Gender.MAN);
-        friendDataBase.addFriendToDataBase("hankook",21,Friend.Gender.MAN);
-        friendDataBase.addFriendToDataBase("kim",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("bae",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("jung",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("hun",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("choi",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("david",11,Friend.Gender.FEMALE);
-        friendDataBase.addFriendToDataBase("kang",11,Friend.Gender.FEMALE);
-        commandService = new CommandService();
+        commandService = new CommandService() {
+            @Override
+            public String executeCommand(FriendDataBase friendDataBase, String[] commandLine) {
+                return null;
+            }
+        };
+    }
+
+    @Test(expected = InvalidFriendNameException.class)
+    public void makeErrorWhenFriendNameOptionIsInvalid() {
+        assertFalse(commandService.friendNameValidCheck("hang2121").equalsIgnoreCase("hang2121"));
     }
     @Test
-    public void executeAddCommandReturnMessageWithFriendName() {
-        String result = commandService.addCommandExecute(friendDataBase,"jessica",21,Friend.Gender.FEMALE);
-        assertTrue(result.equalsIgnoreCase("jessica is added successfully!"));
+    public void returnStringFriendNameIfNameIsValid() {
+        assertTrue(commandService.friendNameValidCheck("hangeul").equalsIgnoreCase("hangeul"));
     }
-    @Test(expected = FriendDataBaseAlreadyFullException.class)
-    public void makeErrorAfterMaximumLimitOfFriendWhenAdding(){
-        assertTrue(commandService.addCommandExecute(
-                friendDataBase,"james",11,Friend.Gender.MAN).equalsIgnoreCase("james is added successfully!"));
-        commandService.addCommandExecute(
-                friendDataBase,"mina",11,Friend.Gender.FEMALE);
+    @Test(expected = InvalidFriendAgeSyntaxException.class)
+    public void makeErrorWhenFriendAgeIsInvalid() {
+        assertFalse(commandService.friendAgeValidCheck("aa")==22);
     }
     @Test
-    public void executeRemoveCommandReturnMessageWithFriendName() {
-        String result = commandService.removeCommandExecute(friendDataBase,"hangeul");
-        assertTrue(result.equalsIgnoreCase("hangeul is removed successfully!"));
+    public void returnIntFriendAgeIfAgeIsValid() {
+        assertEquals(11, commandService.friendAgeValidCheck("11"));
+    }
+    @Test(expected = InvalidGenderSyntaxException.class)
+    public void makeErrorWhenFriendGenderIsInvalid() {
+        assertNotSame(commandService.getGenderFromCommandOption(friendDataBase, "stringMan"), Friend.Gender.MAN);
+        assertNotSame(commandService.getGenderFromCommandOption(friendDataBase,"prettyGirl"), Friend.Gender.FEMALE);
     }
     @Test
-    public void executeFindCommandReturnFriendInformation() {
-        String result = commandService.findCommandExecute(friendDataBase,"hangeul");
-        assertTrue(result.equalsIgnoreCase("hangeul, 11, MAN"));
+    public void returnGenderEnumIfFriendGenderIsValidWord() {
+        assertEquals(commandService.getGenderFromCommandOption(friendDataBase, "male"), Friend.Gender.MAN);
+        assertEquals(commandService.getGenderFromCommandOption(friendDataBase, "Woman"), Friend.Gender.FEMALE);
     }
-    @Test
-    public void executeTimeCommandReturnCurrentLocalTime() {
-        assertTrue(commandService.timeCommandExecute().equalsIgnoreCase("Current Time: "+new Date().toString()));
-    }
-    @Test(expected = FriendDataBaseEmptyException.class)
-    public void makeErrorDatabaseEmptyWhenTryToListCommandWhenNoData() {
-        friendDataBase.getFriendDataBase().clear();
-        commandService.listCommandExecute(friendDataBase);
-    }
-    @Test
-    public void executeListCommandAndReturnFriendInformationByRows() {
-        friendDataBase.getFriendDataBase().clear();
-        commandService.addCommandExecute(friendDataBase, "jessica",21,Friend.Gender.FEMALE);
-        commandService.addCommandExecute(friendDataBase, "joey",22,Friend.Gender.MAN);
-        assertTrue(commandService.listCommandExecute(
-                friendDataBase).equalsIgnoreCase("jessica, 21, FEMALE\njoey, 22, MAN\n"));
-    }
+
 }
