@@ -37,8 +37,11 @@ listCommandExecute(FriendDataBase friendDataBase)
 ```
 ### COMMANDPARSINGSERVICE
 *@groupbot add username age gender*
+
 *@groupbot find username*
+
 *@groupbot list*
+
 *@groupbot time*
 
 ```
@@ -55,6 +58,8 @@ checkIfCommandOptionIsExist
 ### SLACKBOTSERVICE
 
 ### SLACKBOTAPPLICATION
+
+
 
 ## EXCEPTION
 ### FRIENDDATABASEALREADYFULLEXCEPTION
@@ -93,6 +98,8 @@ Gender가 지정 서식(male, man, boy, female, girl, woman) 을 벗어날 경�
 ```
 명령의 대상이 되는 친구가 데이터베이스에 없을 때 명령은 실행될 수 없다.
 ```
+
+
 
 ## TEST
 ### COMMANDPARSINGSERVICETEST
