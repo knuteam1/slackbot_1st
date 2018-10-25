@@ -27,11 +27,10 @@ public class SlackBotService extends Bot {
         String text = event.getText();
         log.info(text);
         try {
-            System.out.println("session = [" + session + "], event = [" + event.getText() + "]");
-            String commandResult = commandParsingService.classifyAndExecuteCommand(friendDataBase, event.getText());
+            String commandResult = commandParsingService.parsingCommand(friendDataBase, event.getText().split("\\s+",2)[1]);
             reply(session, event, commandResult);
-        } catch (RuntimeException e) {
-            reply(session, event, e.getMessage());
+        } catch (RuntimeException error) {
+            reply(session, event, error.getMessage());
         }
     }
 
